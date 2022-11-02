@@ -1,5 +1,5 @@
 # Geno
- all dev is made by Choco 
+ all dev is made by Choco \n
  **python only**
  Simple tool to create discord bots
  
