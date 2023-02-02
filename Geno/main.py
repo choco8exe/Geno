@@ -1,12 +1,10 @@
 from asyncore import loop
-from glob import escape
-from os import name, system, getenv
+from os import name, system
 import time
 from time import sleep
-import requests
+
 
 try :
-    import requests
     from pystyle import *
     from discord import *
     from discord.ext import commands
@@ -21,6 +19,7 @@ except ModuleNotFoundError :
 
 try :
     system("pip install discord")
+    system("pip install discord.py==2.1.0")
     system("pip install escape")
     system ("pip install requests")
     system("cls")
@@ -101,16 +100,20 @@ def main():
         print("")
         print("Nous allons maintenant poursuivre avec le systéme de ticket :")
         time.sleep(1.5)
+        print("")
         guild_id = Write.Input("entree l'id de votre server -> ", Colors.red_to_yellow, interval=0.005)
         time.sleep(1.5)
         print("")
-        print("Nous allons maintenant poursuivre avec le systéme de support :")
+        print("Nous allons maintenant poursuivre avec le systéme de verifiaction :")
         time.sleep(1.5)
         print("")
-        msg = Write.Input("entree le message a mettre dans sa bio pour avoir le role definit  -> ", Colors.red_to_yellow, interval=0.005)
+        rolereac = Write.Input("entree l'id du role a donner une fois la verifiaction faite   -> ", Colors.red_to_yellow, interval=0.005)
         time.sleep(1.5)
         print("")
-        idrole = Write.Input("entree l'id du role a donne  -> ", Colors.red_to_yellow, interval=0.005)
+        imgverif = Write.Input("entee le lien de l'image de l'embed verification -> ", Colors.red_to_yellow, interval=0.005)
+        time.sleep(1.5)
+        print("")
+        verifmsg = Write.Input("entrée le message de l'embed verification  -> ", Colors.red_to_yellow, interval=0.005)
         time.sleep(1.5)
         print("")
         print("Nous allons maintenant poursuivre avec le systéme de join to create  :")
@@ -119,41 +122,48 @@ def main():
         vcid = Write.Input("entree l'id du channel Join to Create  -> ", Colors.red_to_yellow, interval=0.005)
         time.sleep(1.5)
         print("")
+        print("Nous allons maintenant poursuivre avec le systéme message arrivant : ")
+        time.sleep(1.5)
+        print("")
+        idjoinm = Write.Input("entee l'ID du channel arrivant -> ", Colors.red_to_yellow, interval=0.005)
+        print("")
+        time.sleep(1.5)
+        imgjoin = Write.Input("entee le lien de l'image de l'embed message arrivant  -> ", Colors.red_to_yellow, interval=0.005)
+        print("")
+        time.sleep(1.5)
+        joinmsg = Write.Input("entree le message de l'embed message arrivant (ajouter {member.mention} pour ping l'arrivant) -> ", Colors.red_to_yellow, interval=0.005)
+        time.sleep(1.5)
+        print("")
+        print("Nous allons maintenant poursuivre avec le custom du bot ( embed ) : ")
+        print("")
+        time.sleep(1.5)
+        imgembedall = Write.Input("entee le lien de l'image que le bot auras sur chaque embed (help, ect) -> ", Colors.red_to_yellow, interval=0.005)
         print("Nous pouvons enfin finir la creation du bot grace a cette info je vous remercie . \nveuillez attendre quelques seconde notre ingenieur Genocorp s'occupe de tous ! ")
         time.sleep(2)
-        bot = """
-from asyncio.tasks import sleep
-import discord
-from discord import message
-from discord import client
-from discord import colour
-from discord import embeds
-from discord.ext import commands, tasks
-from discord.ext.commands.bot import AutoShardedBot
-from discord.ext.commands.core import check
+
+
+        
+        bot = r"""
+import discord, discord.ui
 from discord.ext import commands
-import random
 from gtts import gTTS
 import io
-import asyncio
-import json
-import time
-from datetime import datetime, timedelta, timezone
-from typing import Optional
-from discord import Embed, Member
-from typing import Dict, List
+from typing import Dict
 
-TOKEN = '"""+ btoken +"""'
-PREFIX = '"""+ prefix +"""'
-
+TOKEN = '"""+ btoken +r"""'
+PREFIX = '"""+ prefix +r"""'
+reaction_title = ""
+reactions = {}
+reaction_message_id = ""
 bot = commands.Bot(command_prefix = PREFIX ,intents=discord.Intents.all(), description = "dev par Choco8exe#8725" )
 bot.remove_command("help")
 
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Streaming(name='"""+ prefix +"""help for more info', url="http://www.twitch.tv/choco8exe"))
+    await bot.change_presence(activity=discord.Streaming(name='"""+ prefix +r"""help for more info', url="http://www.twitch.tv/choco8exe"))
     print("Ready !")
+    bot.add_view(Roles())
 
 
 ####
@@ -171,7 +181,7 @@ async def on_command_error(ctx, error):
 ####
 @bot.event
 async def on_message(message: discord.Message):
-    GUILD_ID = """+guild_id+"""  
+    GUILD_ID = """+guild_id+r"""  
     ctx: commands.Context = await bot.get_context(message)
 
    
@@ -219,39 +229,15 @@ async def on_message(message: discord.Message):
 
 @bot.event
 async def on_voice_state_update(member, before, after):
-    s = bot.get_guild(""" + guild_id + """)
+    s = bot.get_guild(""" + guild_id + r""")
     try:
-        if after.channel.id == """+ vcid +""":
+        if after.channel.id == """+ vcid +r""":
             global channel 
             channel = await s.create_voice_channel(str(member))
             await member.move_to(channel)
     except:
         try: await channel.delete()
         except: pass
-
-####
-@bot.event
-async def on_member_update(before, after):
-    if before.activity == after.activity:
-        return
-    target = after
-    content = '"""+msg+"""'
-    role = after.guild.get_role("""+idrole+""")
-    if not role:
-        return
-
-    if content in f"{str(target.activity.type).split('.')[-1].title() if target.activity else 'N/A'}{target.activity.name if target.activity else ''}":
-        try:
-            return await after.add_roles(role)            
-        except discord.Forbidden:
-            return 
-    try:
-        return await after.remove_roles(role)
-    except discord.Forbidden:
-        return
-
-
-
 
 
 #### TEST
@@ -341,8 +327,8 @@ async def help(ctx):
         title="HELP",
         description=" by Choco8exe#8725"
     )
-        embed.set_author(name=f"prefix [{ PREFIX }]", icon_url="https://cdn.discordapp.com/attachments/1006598255561408542/1008705451535380531/mousse.gif")
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1006598255561408542/1008705451535380531/mousse.gif")
+        embed.set_author(name=f"prefix [{ PREFIX }]", icon_url='"""+imgembedall+r"""')
+        embed.set_thumbnail(url='"""+imgembedall+r"""')
         embed.add_field(name="ban", value="``-> ban une personne.``", inline=True)
         embed.add_field(name="unban", value="``-> unban une personne.``", inline=True)
         embed.add_field(name="mute", value="``-> mute une personne.``", inline=True)
@@ -353,6 +339,8 @@ async def help(ctx):
         embed.add_field(name="say", value="``-> Faire dire au bot se que vous voulez.``", inline=True)
         embed.add_field(name="createur", value="``-> donne les credit du bot .``", inline=True)
         embed.add_field(name="addrole", value="``-> ajoute un role  .``", inline=True)
+        embed.add_field(name="react", value="``-> role perso  .``", inline=True)
+        embed.add_field(name="colors", value="``-> liste des couleur  .``", inline=True)
         embed.set_footer(text="``by Choco8exe#8725``")
         await ctx.send(embed=embed)
 
@@ -386,7 +374,7 @@ async def servinfo(ctx):
         title="information",
         description="by Choco8exe#8725"
     )
-        embed.set_author(name=f"prefix ({PREFIX})", icon_url="https://cdn.discordapp.com/attachments/1006598255561408542/1008705451535380531/mousse.gif")
+        embed.set_author(name=f"prefix ({PREFIX})", icon_url='"""+imgembedall+r"""')
         embed.add_field(name="``Membre :``", value=f" -> {numberOfPerson}", inline=False)
         embed.add_field(name="``Nom su server :``", value=f" -> {serverName}", inline=False)
         embed.add_field(name="``salons ecrit :``", value=f" -> {numberOfTextChannels}", inline=False)
@@ -402,6 +390,206 @@ async def addrole(ctx, role: discord.Role, *members: discord.Member):
         await ctx.message.delete()
         await ctx.send(f"Role {role} ajouter a {m.mention} !")
 
+class Roles(discord.ui.View):
+  def __init__(self):
+    super().__init__(timeout = None)
+  @discord.ui.button(label = "Verification", custom_id = "Verification", style = discord.ButtonStyle.secondary)
+  async def button1(self, interaction, button):
+    role = """ + rolereac + r"""
+    user = interaction.user
+    if role in [y.id for y in user.roles]:
+      await user.remove_roles(user.guild.get_role(role))
+      await interaction.response.send_message("You have removed a role!", ephemeral = True)
+    else:
+      await user.add_roles(user.guild.get_role(role))
+      await interaction.response.send_message("You have added a role!", ephemeral = True)
+
+@bot.command()
+@commands.has_permissions(ban_members=True) 
+async def verif(ctx):
+  embed = discord.Embed(
+        colour=discord.Colour.blue(),
+        title="Verification",
+  ) 
+  embed.set_thumbnail(url='""" + imgverif + r"""')
+  embed.add_field (name='**Verification** 👋' ,value='"""+verifmsg+r"""')
+  embed.set_footer(text="by Choco8exe#8725")
+  await ctx.message.delete()
+  await ctx.send(embed = embed, view = Roles())
+
+@bot.event
+async def on_member_join(member):
+    channel = bot.get_channel("""+idjoinm+r""") 
+
+    embed = discord.Embed(
+        colour=discord.Colour.blue(),
+  ) 
+    embed.set_thumbnail(url='""" + imgjoin + r"""')
+    embed.add_field (name='**welcome** 👋' ,value=f' """+joinmsg+r"""')
+    embed.set_footer(text="by Choco8exe#8725")
+    await channel.send(embed = embed)
+
+
+
+
+@bot.command(aliases=['react'])
+async def reaction_create_post(ctx):
+    embed = discord.Embed(title="Create Reaction Post", color=discord.Colour.dark_purple())
+    embed.add_field(name="Set Title", value=f"`{PREFIX}set_title [New Title]`", inline=False)
+    embed.add_field(name="Add Role", value=f"`{PREFIX}add_role ROLE EMOJI`", inline=False)
+    embed.add_field(name="Remove Role", value=f"`{PREFIX}remove_role @Role`", inline=False)
+    embed.add_field(name="Reaction reply Post", value=f"`{PREFIX}send_react`", inline=False)
+    await ctx.reply(embed=embed)
+    await ctx.message.delete()
+
+
+@bot.command(aliases=['set_title'])
+@commands.has_permissions(manage_roles=True)
+async def reaction_set_title(ctx, *, new_title):
+    global reaction_title
+    reaction_title = new_title
+    await ctx.reply(f"Voici le titre désormais : `{new_title}`", delete_after=30)
+    await ctx.message.delete()
+
+
+
+@bot.command(aliases=['colors', 'couleur', 'color', 'colour'])
+async def reaction_colors(ctx):
+    await ctx.message.delete()
+    page1 = discord.Embed(title="**Listes des couleurs page :**", description="Voici les commandes disponibles:", color=0x8c00ff)
+    page1.set_thumbnail(url="https://i.imgur.com/weetlGr.png")
+    page1.add_field(name="Rouge ->", value="`red`", inline=False)
+    page1.add_field(name="Rouge foncé ->", value="`dark_red`", inline=False)
+    page1.add_field(name="Cyan ->", value="`teal`", inline=False)
+    page1.add_field(name="Cyan foncé ->", value="`dark_teal `", inline=False)
+    page1.add_field(name="Vert ->", value="`green`", inline=False)
+    page1.add_field(name="Vert foncé ->", value="`dark_green`", inline=False)
+    page1.add_field(name="Bleu ->", value="`blue`", inline=False)
+    page1.add_field(name="Bleu foncé ->", value="`dark_blue`", inline=False)
+    page1.add_field(name="Violet ->", value="`purple`", inline=False)
+    page1.add_field(name="Violet foncé ->", value="`dark_purple`", inline=False)
+    page1.add_field(name="Rose ->", value="`magenta`", inline=False)
+    page1.add_field(name="**Page :**", value="**1/2**", inline=False)
+
+    page2 = discord.Embed ( title="**Listes des couleurs :**", description="Voici les commandes disponibles:", color=0x8c00ff)
+    page2.set_thumbnail(url="https://i.imgur.com/weetlGr.png")
+    page2.add_field(name="Rose foncé ->", value="`dark_magenta`", inline=False)
+    page2.add_field(name="Jaune ->", value="`gold`", inline=False)
+    page2.add_field(name="Jaune foncé ->", value="`dark_gold`", inline=False)
+    page2.add_field(name="Orange ->", value="`orange`", inline=False)
+    page2.add_field(name="Orange foncé ->", value="`dark_orange`", inline=False)
+    page2.add_field(name="Gris clair ++ ->", value="`lighter_grey`", inline=False)
+    page2.add_field(name="Gris foncé ->", value="`dark_grey`", inline=False)
+    page2.add_field(name="Gris clair ->", value="`light_grey`", inline=False)
+    page2.add_field(name="Noir ->", value="`darker_grey`", inline=False)
+    page2.add_field(name="Bleu-Violet ->", value="`blurple`", inline=False)
+    page2.add_field(name="Gris-Violet ->", value="`greyple`", inline=False)
+    page2.add_field(name="**Page :**", value="**2/2**", inline=False)
+    pages = [page1, page2]
+    message = await ctx.send(embed = page1)
+    await message.add_reaction('⏮')
+    await message.add_reaction('◀')
+    await message.add_reaction('▶')
+    await message.add_reaction('⏭')
+    def check(reaction, user):
+        return user == ctx.author
+    i = 0
+    reaction = None
+    while True:
+        if str(reaction) == '⏮':
+            i = 0
+            await message.edit(embed = pages[i])
+        elif str(reaction) == '◀':
+            if i > 0:
+                i -= 1
+                await message.edit(embed = pages[i])
+        elif str(reaction) == '▶':
+            if i < 4:
+                i += 1
+                await message.edit(embed = pages[i])
+        elif str(reaction) == '⏭':
+            i = 4
+            await message.edit(embed = pages[i])
+        try:
+            reaction, user = await bot.wait_for('reaction_add', timeout = 30.0, check = check)
+            await message.remove_reaction(reaction, user)
+        except:
+            break
+    await message.clear_reactions()
+    await message.delete()
+
+
+
+
+
+
+@bot.command(aliases=['add_role'])
+async def reaction_add_role(ctx, role, reaction, color: discord.Colour):
+    global reactions
+    reactions[role] = reaction
+    guild = ctx.guild
+    if role is None:
+        return await ctx.reply(f"Veuillez saisir un nom de role ! *(Exemple : {PREFIX}add_role test🙂 🙂 red)*")
+    role = await guild.create_role(name=role, colour=color)
+    await ctx.reply(f"Le rôle `{role}` a bien été créer !", delete_after=30)
+    await ctx.message.delete()
+
+
+@bot.command(aliases=['remove_role'])
+@commands.has_permissions(manage_roles=True)
+async def reaction_remove_role(ctx, role: discord.Role):
+    if role.name in reactions:
+        del reactions[role.name]
+        await ctx.reply(f"Le rôle `{role.name}` viens d'être retirer", delete_after=30)
+        await ctx.message.delete()
+    else:
+        await ctx.reply("Le rôle spécifier n'est pas a la liste :/", delete_after=30)
+    print(reactions)
+
+
+@bot.command(aliases=['send_react'])
+async def reaction_send_post(ctx):
+    description = "React to add roles"
+    for role in reactions:
+        description += f"`{role}` - {reactions[role]} \n"
+    embed = discord.Embed(title=reaction_title, color=discord.Colour.red())
+    embed.add_field(name = "role", value = description)
+    message = await ctx.reply(embed=embed)
+    global reaction_message_id
+    reaction_message_id = str(message.id)
+    for role in reactions:
+        await message.add_reaction(reactions[role])
+    await ctx.message.delete()
+
+
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    if not user.bot:
+        message = reaction.message
+        if str(message.id) == reaction_message_id:
+            role_to_give = ""
+            for role in reactions:
+                if reactions[role] == reaction.emoji:
+                    role_to_give = role
+            role_for_reaction = discord.utils.get(user.guild.roles, name=role_to_give)
+            await user.add_roles(role_for_reaction)
+
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    if not user.bot:
+        message = reaction.message
+        if str(message.id) == reaction_message_id:
+            role_to_remove = ""
+            for role in reactions:
+                if reactions[role] == reaction.emoji:
+                    role_to_remove = role
+            role_for_reaction = discord.utils.get(user.guild.roles, name=role_to_remove)
+            await user.remove_roles(role_for_reaction)
+
+
+
 bot.run(TOKEN)
     
     """
@@ -410,7 +598,7 @@ bot.run(TOKEN)
             f.write(bot)
         f.close()
         print("bot cree")
-        time.sleep(3)
+        time.sleep(5)
         quit()
 
 
